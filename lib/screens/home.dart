@@ -1,21 +1,33 @@
 // ignore_for_file: unnecessary_const
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:student_reward_system/data/User.dart';
+import 'package:http/http.dart' as http;
+import 'package:student_reward_system/screens/dashboard.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final bool isRegistration;
+  const HomePage({Key? key, required this.isRegistration}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController userEmailController = TextEditingController();
+  final TextEditingController userPswdController = TextEditingController();
+
   Container _PaddedField(
       TextEditingController? tc, String hint, String hintText) {
     return Container(
       margin: const EdgeInsets.all(14.0),
       padding: const EdgeInsets.all(14.0),
       child: TextField(
+        controller: tc,
         decoration: InputDecoration(
             hintText: hintText,
             label: Text(hint),
@@ -57,26 +69,81 @@ class _HomePageState extends State<HomePage> {
                             .displayMedium
                             ?.copyWith(color: Colors.black87)),
                   ),
-                  _PaddedField(null, "Username", "Ex : CM_B_73"),
-                  _PaddedField(null, "User email", "Enter Your College Email"),
-                  _PaddedField(
-                      null, "Password", "Enter your 6 character password"),
+                  widget.isRegistration
+                      ? _PaddedField(
+                          userNameController, "Username", "Ex : CM_B_73")
+                      : Container(),
+                  _PaddedField(userEmailController, "User email",
+                      "Enter Your College Email"),
+                  _PaddedField(userPswdController, "Password",
+                      "Enter your 6 character password"),
                   SizedBox(
                     height: height * 0.01,
                     width: width * .7,
                   ),
-                  ElevatedButton(
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: const Text(
-                          "Register",
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                      ),
-                      onPressed: () {
-                        //TODO: Add Auth
-                        Navigator.of(context).pushNamed('/dashboard');
-                      })
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              widget.isRegistration ? "Register" : "Login",
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                          ),
+                          onPressed: () async {
+                            var email = userEmailController.value.text;
+                            var pswd = userPswdController.value.text;
+                            if (!widget.isRegistration) {
+                              User loggedIn = User(email, pswd);
+                              print("LOGGING " + email + pswd);
+                              var res = await http.post(
+                                  Uri.parse("http://localhost:7000/login"),
+                                  body: loggedIn.toLoginMap());
+                              //omkar@mail.com
+                              //test123456
+                              loggedIn.updateFromResponce(res.body);
+                              if (res.statusCode == 200) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (ctx) =>
+                                        Dashboard(user: loggedIn)));
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (ctx) => const AlertDialog(
+                                          content: const Center(
+                                            child: const Text(
+                                                "Invalid Credentials Please Regitser"),
+                                          ),
+                                        ));
+                              }
+                            } else {
+                              var userName = userNameController.text;
+                              var u = User(email, pswd);
+                              u.name = userName;
+                              var res = await http.post(
+                                  Uri.parse("http://localhost:7000/register"),
+                                  body: u.toRegisterMap());
+                              print(res.statusCode);
+                              print(res.body);
+                            }
+                          }),
+                      InkWell(
+                          onTap: () {
+                            if (widget.isRegistration) {
+                              Navigator.of(context).pushNamed("/home");
+                            } else {
+                              Navigator.of(context).pushNamed("/register");
+                            }
+                          },
+                          child: Text(
+                              widget.isRegistration ? "Login" : "Register",
+                              style: const TextStyle(
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline)))
+                    ],
+                  )
                 ],
               ),
             ),

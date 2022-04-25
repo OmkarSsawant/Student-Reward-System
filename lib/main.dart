@@ -11,9 +11,19 @@ class StudentRewardSystemApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: const HomePage(), initialRoute: '/home', routes: {
-      "/home": (context) => const HomePage(),
-      "/dashboard": (context) => const Dashboard()
-    });
+    return MaterialApp(
+      home: const HomePage(
+        isRegistration: false,
+      ),
+      initialRoute: '/home',
+      routes: {
+        "/home": (context) => const HomePage(
+              isRegistration: false,
+            ),
+        "/register": (context) => const HomePage(
+              isRegistration: true,
+            )
+      },
+    );
   }
 }
