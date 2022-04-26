@@ -13,13 +13,7 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-const CARD_TYPES = [
-  "thank-you",
-  "well-done",
-  "excellence",
-  "attitude",
-  "leader"
-];
+const CARD_TYPES = ["thankYou", "wellDone", "excellence", "attitude", "leader"];
 
 class _DashboardState extends State<Dashboard> {
   late User user;
@@ -165,22 +159,22 @@ class _DashboardState extends State<Dashboard> {
               Expanded(
                   flex: 2,
                   child: Card(
-                    color: const Color.fromARGB(255, 255, 107, 107),
+                    color: Color.fromARGB(79, 15, 1, 1),
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 17, vertical: 7),
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height * .6,
                       child: ListView(
-                        children: mockWinners
+                        children: user.winners
                             .map((e) => Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Card(
                                     elevation: 45,
                                     child: ListTile(
                                       tileColor: Colors.white,
-                                      title: Text(e.keys.first),
-                                      subtitle: Text(e.values.first),
+                                      title: Text(e["userMail"]),
+                                      subtitle: Text(e["category"]),
                                     ),
                                   ),
                                 ))

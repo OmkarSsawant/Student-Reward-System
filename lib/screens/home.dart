@@ -126,6 +126,16 @@ class _HomePageState extends State<HomePage> {
                                   Uri.parse("http://localhost:7000/register"),
                                   body: u.toRegisterMap());
                               print(res.statusCode);
+                              if (res.statusCode == 200) {
+                                const sb = SnackBar(
+                                    content:
+                                        Text("Successfully Registered User"));
+                                ScaffoldMessenger.of(context).showSnackBar(sb);
+                              } else {
+                                const sb = SnackBar(
+                                    content: Text("Please Try Again !"));
+                                ScaffoldMessenger.of(context).showSnackBar(sb);
+                              }
                               print(res.body);
                             }
                           }),

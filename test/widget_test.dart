@@ -18,7 +18,7 @@ void main() async {
   // print(res2.statusCode);
   // print(res2.body);
 
-  var u = User(null, "omkar@mail.com", "test123456");
+  var u = User("omkar@mail.com", "test123456");
   var res = await http.post(Uri.parse("http://localhost:7000/login"),
       body: u.toLoginMap());
   print(res.statusCode);
